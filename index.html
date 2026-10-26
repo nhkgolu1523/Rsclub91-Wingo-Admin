@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0e17">
+<title>WinGo . Upcoming Results</title>
+<style>
+  :root {
+    --bg: #0a0e17;
+    --panel: #111726;
+    --panel2: #161e30;
+    --line: #1f2940;
+    --line2: #2b3855;
+    --text: #f1f5ff;
+    --dim: #7b89a8;
+    --dim2: #4e5a75;
+    --green: #22c55e;
+    --red: #ef4444;
+    --violet: #a855f7;
+    --amber: #f59e0b;
+    --blue: #3b82f6;
+    --accent: #22c55e;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; padding-bottom: 60px; }
+
+  /* subtle top glow */
+  body::before {
+    content: ""; position: fixed; top: -180px; left: 50%; transform: translateX(-50%);
+    width: 640px; height: 360px; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(34,197,94,0.14), transparent 70%);
+    filter: blur(10px);
+  }
+
+  .wrap { max-width: 560px; margin: 0 auto; padding: 0 18px; position: relative; }
+
+  /* ---------- header ---------- */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 0 18px;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; }
+  .brand .mark {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: linear-gradient(145deg, #1c9e4f, #14713a);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 17px; color: #eafff2;
+    box-shadow: 0 6px 20px rgba(34,197,94,0.28), inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  
+  .brand .name { font-size: 16px; font-weight: 700; letter-spacing: -0.2px; color: #ffffff; }
+  .brand .name em { font-style: normal; color: #ffffff; font-weight: 500; }
+  .brand .sub { font-size: 11px; color: #ffffff; margin-top: 2px; letter-spacing: 0.2px; }
+
+  .live {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 11.5px; color: #ffffff; font-weight: 600;
+    background: var(--panel); border: 1px solid var(--line);
+    padding: 7px 12px; border-radius: 999px;
+  }
+  .live .p { width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+    box-shadow: 0 0 0 0 rgba(34,197,94,0.6); animation: rp 1.8s infinite; }
+  .live.off .p { background: var(--red); animation: none; }
+  @keyframes rp { 0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)} 70%{box-shadow:0 0 0 7px rgba(34,197,94,0)} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0)} }
+
+  /* ---------- mode pills ---------- */
+  .modes {
+    display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 4px;
+    scrollbar-width: none;
+  }
+  .modes::-webkit-scrollbar { display: none; }
+  .mode {
+    flex: 1 0 auto; min-width: 0;
+    padding: 12px 4px; border-radius: 13px; cursor: pointer;
+    background: var(--panel); border: 1px solid var(--line);
+    text-align: center; transition: all .18s ease; color: var(--dim);
+    font-size: 14px; font-weight: 700; letter-spacing: -0.2px;
+  }
+  .mode.active {
+    background: linear-gradient(160deg, #20934d, #17723d);
+    border-color: #2bb35e; color: #f2fff7;
+    box-shadow: 0 6px 20px rgba(34,197,94,0.22);
+  }
+
+  /* ---------- next result hero ---------- */
+  .next {
+    margin-top: 18px; padding: 22px 20px;
+    border-radius: 22px; position: relative; overflow: hidden;
+    background: linear-gradient(160deg, #12281d, #101b2c);
+    border: 1px solid #1c4030;
+    box-shadow: 0 18px 44px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: border-color .3s;
+  }
+  .next.wait { border-color: var(--line2); background: linear-gradient(160deg, #131a29, #101622); }
+  
+  .next .kick {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1.6px;
+    color: #ffffff; font-weight: 700; margin-bottom: 14px;
+  }
+
+  /* Modified Main Layout */
+  .next .main { 
+    display: flex; align-items: center; justify-content: space-between; gap: 18px; 
+    margin-bottom: 16px;
+  }
+  
+  .next .digit {
+    font-size: 74px; font-weight: 800; line-height: 0.9;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, #ffffff, #b8c6e2);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    min-width: 78px; text-align: center;
+  }
+  .next .digit.wait { background: linear-gradient(180deg,#5c6b8a,#3f4b64); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  
+  /* Stylish Big Timer */
+  .timer-wrap {
+    display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
+  }
+  .timer-big {
+    font-size: 56px; font-weight: 900; line-height: 0.9;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    text-shadow: 0 0 25px rgba(34,197,94,0.4);
+    display: flex; align-items: baseline; gap: 4px;
+    transition: all 0.3s ease;
+  }
+  .timer-big.warn { 
+    color: var(--amber); 
+    text-shadow: 0 0 25px rgba(245,158,11,0.5); 
+    transform: scale(1.05);
+  }
+  .timer-unit {
+    font-size: 16px; font-weight: 800; color: var(--dim); letter-spacing: 1px;
+  }
+
+  /* Premium Tags (Green/Big) */
+  .next .tags { 
+    display: flex; flex-direction: row; gap: 10px; align-items: center; 
+    justify-content: flex-start; margin-top: 5px;
+  }
+  .tag {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 8px 18px; border-radius: 10px;
+    font-size: 13px; font-weight: 800; letter-spacing: 0.5px;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+  }
+  .tag.green { background: rgba(34,197,94,0.15); color: #4ade80; border: 1.5px solid rgba(34,197,94,0.4); box-shadow: 0 4px 15px rgba(34,197,94,0.15); }
+  .tag.red { background: rgba(239,68,68,0.15); color: #f87171; border: 1.5px solid rgba(239,68,68,0.4); box-shadow: 0 4px 15px rgba(239,68,68,0.15); }
+  .tag.violet { background: rgba(168,85,247,0.15); color: #c084fc; border: 1.5px solid rgba(168,85,247,0.4); box-shadow: 0 4px 15px rgba(168,85,247,0.15); }
+  .tag.big { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1.5px solid rgba(245,158,11,0.4); box-shadow: 0 4px 15px rgba(245,158,11,0.15); }
+  .tag.small { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1.5px solid rgba(59,130,246,0.4); box-shadow: 0 4px 15px rgba(59,130,246,0.15); }
+  .tag.wait { background: rgba(120,132,160,0.15); color: var(--dim); border: 1.5px solid var(--line2); }
+  
+  .next .iss {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px; color: #ffffff; margin-top: 16px; word-break: break-all;
+    padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .dotgrid {
+    position: absolute; inset: 0; opacity: .3; pointer-events: none;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 16px 16px; mask-image: radial-gradient(circle at 100% 0%, #000, transparent 60%);
+    -webkit-mask-image: radial-gradient(circle at 100% 0%, #000, transparent 60%);
+  }
+
+  /* ---------- section bar ---------- */
+  .bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 26px 0 12px;
+  }
+  .bar .t { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.4px; color: var(--dim); }
+  .bar .cnt { font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; }
+
+  /* ---------- rows ---------- */
+  .rows { display: flex; flex-direction: column; gap: 9px; }
+  .r {
+    display: flex; align-items: center; gap: 14px;
+    padding: 13px 15px; border-radius: 15px; cursor: pointer;
+    background: var(--panel); border: 1px solid var(--line);
+    transition: border-color .15s, background .15s, transform .1s;
+    position: relative;
+    margin-top: 15px;
+  }
+  .r:hover { border-color: var(--line2); background: var(--panel2); }
+  .r:active { transform: scale(0.99); }
+  
+  .next-badge {
+    position: absolute;
+    top: -12px; right: 20px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #ffffff;
+    font-style: italic; font-weight: 900; font-size: 12px; letter-spacing: 1px;
+    padding: 4px 14px; border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    text-transform: uppercase; z-index: 10;
+  }
+
+  .r .idx {
+    width: 40px; height: 40px; flex-shrink: 0; border-radius: 11px;
+    background: var(--panel2); border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .r.soon .idx { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); color: #4ade80; }
+  .r .mid { flex: 1; min-width: 0; }
+  .r .when { font-size: 13.5px; font-weight: 650; letter-spacing: -0.1px; }
+  .r .when .in { color: #ffffff; font-weight: 500; }
+  .r .id {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px; color: #ffffff; margin-top: 3px; word-break: break-all;
+  }
+
+  .r .val {
+    font-size: 30px; font-weight: 800; line-height: 1;
+    font-variant-numeric: tabular-nums; min-width: 40px; text-align: center;
+  }
+  .r .val.green { color: #4ade80; }
+  .r .val.red { color: #f87171; }
+  .r .val.violet { color: #c084fc; }
+  .r .val.wait { color: #3f4b64; font-size: 22px; }
+  .r .col { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .r .mini { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
+  .r .mini.green { color: #4ade80; }
+  .r .mini.red { color: #f87171; }
+  .r .mini.violet { color: #c084fc; }
+  .r .mini.big { color: #fbbf24; }
+  .r .mini.small { color: #60a5fa; }
+  .r .mini.wait { color: var(--dim); }
+
+  .empty { text-align: center; padding: 46px 20px; color: var(--dim); font-size: 14px; }
+  .empty .big { font-size: 40px; margin-bottom: 12px; opacity: .5; }
+
+  /* ---------- modal ---------- */
+  .mbg {
+    position: fixed; inset: 0; z-index: 100; display: none;
+    align-items: center; justify-content: center; padding: 22px;
+    background: rgba(4,7,14,0.72); backdrop-filter: blur(6px);
+  }
+  .mbg.on { display: flex; }
+  .modal {
+    width: 100%; max-width: 360px; border-radius: 22px; padding: 22px;
+    background: var(--panel); border: 1px solid var(--line2);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+    animation: mp .2s ease-out;
+  }
+  @keyframes mp { from{transform:scale(.94);opacity:0} to{transform:scale(1);opacity:1} }
+  .modal h3 { margin: 0 0 3px; font-size: 16px; font-weight: 700; }
+  .modal .sm { font-size: 12px; color: var(--dim); margin-bottom: 16px; }
+  .modal .id {
+    font-family: ui-monospace, monospace; font-size: 11.5px; color: var(--dim);
+    text-align: center; word-break: break-all; margin-bottom: 16px;
+    background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 9px;
+  }
+  .ngrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; margin-bottom: 18px; }
+  .nb {
+    aspect-ratio: 1; border-radius: 13px; background: var(--panel2);
+    border: 1.5px solid var(--line); color: var(--text);
+    font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .1s;
+  }
+  .nb:hover { border-color: var(--line2); }
+  .nb:active { transform: scale(0.94); }
+  .nb.sel { background: linear-gradient(160deg,#20934d,#17723d); border-color: #2bb35e; color: #f2fff7; }
+  .nb.cur { border-color: var(--amber); }
+  .acts { display: flex; gap: 10px; }
+  .acts button {
+    flex: 1; height: 46px; border-radius: 12px; border: none; font-size: 14.5px;
+    font-weight: 700; font-family: inherit; cursor: pointer; transition: all .15s;
+  }
+  .acts .c { background: var(--panel2); color: var(--text); border: 1px solid var(--line); }
+  .acts .s { background: linear-gradient(160deg,#20934d,#17723d); color: #f2fff7; }
+  .acts .s:disabled { opacity: .45; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="mark">W</div>
+      <div>
+        <div class="name">WinGo <em>Results</em></div>
+        <div class="sub" id="subTxt">Upcoming draw schedule</div>
+      </div>
+    </div>
+    <div class="live" id="livePill"><span class="p"></span><span id="liveTxt">Live</span></div>
+  </header>
+
+  <div class="modes" id="modes">
+    <div class="mode active" data-mode="30SEC">30 Sec</div>
+    <div class="mode" data-mode="1MIN">1 Min</div>
+    <div class="mode" data-mode="3MIN">3 Min</div>
+    <div class="mode" data-mode="5MIN">5 Min</div>
+  </div>
+
+  <div class="next" id="nextCard">
+    <div class="dotgrid"></div>
+    <div class="kick">
+      <span>THIS PERIOD RESULT</span>
+    </div>
+    <div class="main">
+      <div class="digit" id="nextDigit">-</div>
+      
+      <!-- Stylish Big Timer -->
+      <div class="timer-wrap">
+        <div class="timer-big" id="cd">0</div>
+        <div class="timer-unit">SEC</div>
+      </div>
+    </div>
+
+    <!-- Premium Tags -->
+    <div class="tags" id="nextTags">
+      <span class="tag wait">Waiting</span>
+    </div>
+
+    <div class="iss" id="nextIss">-</div>
+  </div>
+
+  <div class="bar">
+    <div class="t">Upcoming</div>
+    <div class="cnt" id="cntTxt">50 draws</div>
+  </div>
+
+  <div class="rows" id="rows"></div>
+
+</div>
+
+<div class="mbg" id="mbg">
+  <div class="modal">
+    <h3>Change result</h3>
+    <div class="sm">This period's value in Firebase</div>
+    <div class="id" id="mId"></div>
+    <div class="ngrid" id="ngrid"></div>
+    <div class="acts">
+      <button class="c" id="mCancel">Cancel</button>
+      <button class="s" id="mSave" disabled>Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const BASE = 'https://rsclub91-62526-default-rtdb.firebaseio.com/GAME-RESULTS/WINGO';
+  const POLL_MS = 2500;
+
+  const TYPES = {
+    '30SEC': { code: '10030',  pad: 4, seconds: 30,  draw: 5  },
+    '1MIN':  { code: '10001',  pad: 4, seconds: 60,  draw: 15 },
+    '3MIN':  { code: '100020', pad: 3, seconds: 180, draw: 15 },
+    '5MIN':  { code: '10101',  pad: 4, seconds: 300, draw: 15 }
+  };
+
+  const $ = (id) => document.getElementById(id);
+
+  const ROW_COUNT = 50;
+
+  let mode = '30SEC';
+  let cache = {};
+  let editIssue = null, editSel = null, editCur = null;
+  let modalOn = false;
+  let lastCur = null, lastShown = null;
+  let pollT = null, tickT = null;
+
+  function pad(n, l) { n = String(n); while (n.length < l) n = '0' + n; return n; }
+  function colourOf(n) { if (n === 0) return 'red'; if (n === 5) return 'violet'; return n % 2 ? 'green' : 'red'; }
+  function colourTag(n) {
+    if (n === 0) return 'red-violet';
+    if (n === 5) return 'green-violet';
+    return n % 2 ? 'green' : 'red';
+  }
+  function sizeOf(n) { return n >= 5 ? 'Big' : 'Small'; }
+  function prettyColour(c) { return c.split('-').map(x => x[0].toUpperCase() + x.slice(1)).join('+'); }
+
+  function ist() {
+    const now = new Date();
+    const d = new Date(now.getTime() + now.getTimezoneOffset() * 60000 + 5.5 * 3600000);
+    return { y: d.getFullYear(), mo: d.getMonth(), da: d.getDate(), dayStart: new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(), ms: d.getTime() };
+  }
+  function issueAt(offset) {
+    const t = TYPES[mode], p = ist();
+    const sec = Math.floor((p.ms - p.dayStart) / 1000);
+    const base = Math.floor(sec / t.seconds) + 1;
+    const idx = base + offset;
+    const start = p.dayStart + (idx - 1) * t.seconds * 1000;
+    const d = new Date(start);
+    return { issue: `${d.getFullYear()}${pad(d.getMonth()+1,2)}${pad(d.getDate(),2)}${t.code}${pad(idx,t.pad)}`, start, idx };
+  }
+  function currentAt() { return issueAt(0); }
+  function idxOf(issue) { const t = TYPES[mode]; const n = parseInt(String(issue).substr(8 + t.code.length), 10); return isNaN(n) ? 0 : n; }
+  function passTime() { const t = TYPES[mode], p = ist(); const sec = (p.ms - p.dayStart) / 1000; return t.seconds - (sec % t.seconds); }
+  function clockStr(msTime) {
+    const d = new Date(msTime);
+    let h = d.getHours(), m = d.getMinutes();
+    const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+    return `${pad(h,2)}:${pad(m,2)} ${ap}`;
+  }
+
+  async function fetchMode(m) {
+    const r = await fetch(`${BASE}/${m}.json`, { cache: 'no-store' });
+    if (!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    return (d && typeof d === 'object') ? d : {};
+  }
+  async function put(m, issue, v) {
+    const r = await fetch(`${BASE}/${m}/${issue}.json`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Number(v))
+    });
+    if (!r.ok) throw new Error(r.status);
+  }
+
+  function setLive(ok) {
+    $('livePill').classList.toggle('off', !ok);
+    $('liveTxt').textContent = ok ? 'Live' : 'Offline';
+  }
+
+  function renderNext() {
+    const cur = currentAt();
+    const map = cache[mode] || {};
+    const val = map[cur.issue];
+    const has = !(val === undefined || val === null || isNaN(val));
+    const card = $('nextCard');
+    const dg = $('nextDigit');
+    const tags = $('nextTags');
+
+    card.classList.toggle('wait', !has);
+    $('nextIss').textContent = cur.issue;
+
+    if (!has) {
+      dg.className = 'digit wait'; dg.textContent = '-';
+      tags.innerHTML = '<span class="tag wait">Waiting</span>';
+    } else {
+      if (lastShown !== mode + cur.issue + val) {
+        dg.className = 'digit'; dg.textContent = val; lastShown = mode + cur.issue + val;
+      }
+      const c = colourTag(val), s = sizeOf(val);
+      dg.className = 'digit';
+      dg.textContent = val;
+      tags.innerHTML =
+        `<span class="tag ${c === 'green' ? 'green' : c === 'red' ? 'red' : 'violet'}">${prettyColour(c)}</span>` +
+        `<span class="tag ${s.toLowerCase()}">${s}</span>`;
+    }
+    renderCd();
+  }
+
+  function renderCd() {
+    const el = $('cd');
+    const t = TYPES[mode];
+    let p = passTime();
+    if (p < 0) p = 0;
+    const G = Math.floor(p);
+    el.className = 'timer-big' + (G <= t.draw ? ' warn' : '');
+    el.textContent = G;
+  }
+
+  function renderRows() {
+    if (modalOn) return;
+    const map = cache[mode] || {};
+    const total = ROW_COUNT;
+    const rows = [];
+    for (let i = 1; i <= total; i++) rows.push(issueAt(i));
+
+    $('cntTxt').textContent = total + ' draws';
+
+    $('rows').innerHTML = rows.map((r, n) => {
+      const val = map[r.issue];
+      const has = !(val === undefined || val === null || isNaN(val));
+      const start = r.start, end = start + TYPES[mode].seconds * 1000;
+      const soon = n === 0;
+      let valHtml, miniHtml;
+      if (!has) {
+        valHtml = '<div class="val wait">...</div>';
+        miniHtml = '<div class="mini wait">no value</div>';
+      } else {
+        const c = colourTag(val), s = sizeOf(val);
+        valHtml = `<div class="val ${c === 'violet' ? 'violet' : c}">${val}</div>`;
+        miniHtml = `<div class="mini ${s.toLowerCase()}">${s}</div>`;
+      }
+      
+      const when = `<span class="in">${clockStr(start)}-${clockStr(end)}</span>`;
+      
+      return `<div class="r${soon ? ' soon' : ''}" data-issue="${r.issue}">
+        ${n === 0 ? '<div class="next-badge">NEXT</div>' : ''}
+        <div class="idx">${n === 0 ? 'NEXT' : '#' + r.idx}</div>
+        <div class="mid">
+          <div class="when">${when}</div>
+          <div class="id">${r.issue}</div>
+        </div>
+        <div class="col">${valHtml}${miniHtml}</div>
+      </div>`;
+    }).join('');
+
+    $('rows').querySelectorAll('.r').forEach(el => el.addEventListener('click', () => openEdit(el.dataset.issue)));
+  }
+
+  function renderAll() { renderNext(); renderRows(); }
+
+  let polling = false;
+  async function poll(spin) {
+    if (polling) return; polling = true;
+    try {
+      cache[mode] = await fetchMode(mode);
+      setLive(true);
+      renderAll();
+    } catch (e) { setLive(false); console.warn(e); }
+    finally { polling = false; }
+  }
+  function startTick() {
+    if (tickT) clearInterval(tickT);
+    tickT = setInterval(() => {
+      renderCd();
+      const cur = currentAt().issue;
+      if (cur !== lastCur) { lastCur = cur; renderNext(); poll(true); }
+    }, 1000);
+  }
+  function startPoll() { if (pollT) clearInterval(pollT); pollT = setInterval(() => poll(false), POLL_MS); }
+
+  function openEdit(issue) {
+    editIssue = issue; editSel = null; editCur = (cache[mode] || {})[issue]; modalOn = true;
+    $('mId').textContent = issue;
+    const g = $('ngrid'); g.innerHTML = '';
+    for (let i = 0; i <= 9; i++) {
+      const b = document.createElement('button');
+      b.className = 'nb'; b.textContent = i;
+      if (editCur === i) { b.classList.add('cur', 'sel'); editSel = i; }
+      b.addEventListener('click', () => {
+        g.querySelectorAll('.nb').forEach(x => x.classList.remove('sel'));
+        b.classList.add('sel'); editSel = i;
+        $('mSave').disabled = (i === editCur);
+      });
+      g.appendChild(b);
+    }
+    $('mSave').disabled = (editSel === null || editSel === editCur);
+    $('mbg').classList.add('on');
+  }
+  function closeEdit() {
+    $('mbg').classList.remove('on');
+    editIssue = editSel = editCur = null; modalOn = false;
+    setTimeout(renderAll, 50);
+  }
+  async function saveEdit() {
+    if (editIssue === null || editSel === null) return;
+    const m = mode, iss = editIssue, v = editSel;
+    $('mSave').disabled = true; $('mSave').textContent = 'Saving...';
+    try {
+      await put(m, iss, v);
+      cache[m][iss] = v;
+      console.log('Saved . #' + idxOf(iss) + ' -> ' + v); 
+      closeEdit(); renderAll();
+    } catch (e) { 
+      console.error('Save failed', e); 
+    }
+    finally { $('mSave').textContent = 'Save'; }
+  }
+
+  $('modes').addEventListener('click', e => {
+    const t = e.target.closest('.mode'); if (!t) return;
+    if (t.dataset.mode === mode) return;
+    mode = t.dataset.mode; lastCur = null; lastShown = null;
+    $('modes').querySelectorAll('.mode').forEach(x => x.classList.toggle('active', x === t));
+    $('rows').innerHTML = '<div class="empty">Loading...</div>';
+    poll(true);
+  });
+  $('mCancel').addEventListener('click', closeEdit);
+  $('mSave').addEventListener('click', saveEdit);
+  $('mbg').addEventListener('click', e => { if (e.target === $('mbg')) closeEdit(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(true); });
+
+  poll(true); startPoll(); startTick();
+})();
+</script>
+</body>
+</html>
